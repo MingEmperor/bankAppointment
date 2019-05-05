@@ -36,7 +36,7 @@ export default {
   methods: {
     postUserInfo () {
       if (this.userName !== '' && this.password !== '') {
-        this.$axios.post('api/login.do', {
+        this.$axios.post('/BankNumber/login.do', {
           username: this.userName,
           password: this.password,
           unlink: this.unlink === '用户' ? 0 : 1

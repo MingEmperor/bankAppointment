@@ -11,12 +11,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api':{
+      '/BankNumber':{
         // 测试环境
         target: 'http://39.96.32.35:8080/',  //接口域名
         changeOrigin: true,  // 是否跨域
         pathRewrite: {
-          '^/api':'/BankNumber/user/'
+          '^/BankNumber':'/BankNumber/user/'
         }
       }
     },

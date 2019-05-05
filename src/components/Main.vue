@@ -27,14 +27,14 @@
         理财业务
       </el-menu-item>
       <el-menu-item class='user-name' index="5">
-        用户名
+        {{ form.name }}
       </el-menu-item>
     </el-menu>
     <el-button
       v-if='!personCenter'
       class='order-btn'
       type='primary'
-      @click="qwe"
+      @click='handleOpenDialog'
     >
       点击排号
     </el-button>
@@ -42,25 +42,42 @@
       <el-form-item label='用户名'>
         <el-input v-model="form.name"></el-input>
       </el-form-item>
+      <el-form-item label='密码'>
+        <el-input type='password' v-model="form.password"></el-input>
+      </el-form-item>
       <el-form-item label='手机号'>
         <el-input type='tel' v-model="form.tel"></el-input>
       </el-form-item>
       <el-form-item label='邮箱'>
         <el-input type='email' v-model="form.email"></el-input>
       </el-form-item>
-      <el-form-item label='用户类型'>
-        <el-radio-group v-model="form.type">
-          <el-radio label="用户"></el-radio>
-          <el-radio label="工作人员"></el-radio>
-        </el-radio-group>
-      </el-form-item>
       <el-form-item label="用户介绍">
         <el-input type="textarea" v-model="form.desc"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">确认修改</el-button>
+        <el-button type="primary" @click="handleUpdate">确认修改</el-button>
       </el-form-item>
     </el-form>
+
+    <el-dialog title="当前排号信息" :visible.sync="dialogTableVisible">
+      <el-form ref="form" :model="form" label-width="80px">
+      <el-form-item label='用户名'>
+        <el-tag class='info-tag' type="info">
+          {{form.name}}
+        </el-tag>
+      </el-form-item>
+      <el-form-item label='手机号'>
+        <el-tag class='info-tag' type="info">
+          {{form.tel}}
+        </el-tag>
+      </el-form-item>
+      <el-form-item label='排号号码'>
+        <el-tag class='info-tag-uNumber' type="info">
+          {{form.uNumber}}
+        </el-tag>
+      </el-form-item>
+    </el-form>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,19 +87,33 @@ export default {
     return {
       activeIndex: '1',
       personCenter: false,
+      dialogTableVisible: false,
       form: {
         name: '',
         tel: '',
+        qq: '',
         email: '',
-        type: '',
-        desc: ''
+        password: '',
+        desc: '',
+        uNumber: ''
+      },
+      gridData: {
+        date: '',
+        name: '',
+        address: ''
       }
     }
   },
   created () {
-    this.$axios.post('/api/paihao.do', {}, {withCredentials: true})
+    this.$axios.post('/BankNumber/user.do')
       .then(res => {
-        console.log(res)
+        console.log(res.data)
+        this.form.name = res.data.username
+        this.form.tel = res.data.telephone
+        this.form.qq = res.data.qq
+        this.form.email = res.data.email
+        this.form.password = res.data.password
+        this.form.desc = res.data.udesc
       })
   },
   methods: {
@@ -107,10 +138,32 @@ export default {
           console.log('')
       }
     },
-    qwe () {
-      this.$axios.post('/api/user.do')
+    handleUpdate () {
+      this.$axios.post('/BankNumber/updateUserInfo.do', {
+        username: this.form.name,
+        password: this.form.password,
+        email: this.form.email,
+        telephone: this.form.tel,
+        udesc: this.form.udesc
+      })
         .then(res => {
-          console.log(res)
+          if (res.data.message) {
+            console.log(res.data.message)
+            this.$message({
+              message: '修改成功，重新登录后可见',
+              type: 'success'
+            })
+          }
+        })
+    },
+    handleOpenDialog () {
+      this.dialogTableVisible = true
+      this.$axios.post('/BankNumber/paihao.do')
+        .then(res => {
+          console.log(res.data)
+          this.form.name = res.data.username
+          this.form.tel = res.data.telephone
+          this.form.uNumber = res.data.uNumber
         })
     }
   }
@@ -121,6 +174,22 @@ export default {
 .user-name{
   margin-right: 1rem;
   float: right;
+}
+.info-tag{
+  width: 20rem;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  font-size: 1.25rem;
+}
+.info-tag-uNumber{
+  width: 20rem;
+  height: 3rem;
+  line-height: 3rem;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #409EFF;
 }
 .order-btn{
   position: absolute;
