@@ -31,14 +31,20 @@
       </el-menu-item>
     </el-menu>
     <el-button
-      v-if='!personCenter'
+      v-if='order'
       class='order-btn'
       type='primary'
       @click='handleOpenDialog'
     >
       点击排号
     </el-button>
-    <el-form v-else ref="form" class='person-info' :model="form" label-width="80px">
+    <el-form
+      v-if='personCenter'
+      ref="form"
+      class='person-info'
+      :model="form"
+      label-width="80px"
+    >
       <el-form-item label='用户名'>
         <el-input v-model="form.name"></el-input>
       </el-form-item>
@@ -78,6 +84,47 @@
       </el-form-item>
     </el-form>
     </el-dialog>
+
+    <el-dialog title="基金介绍" :visible.sync="dialogFundsVisible">
+      <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item label='基金名称'>
+          <el-tag class='info-tag' type="info">
+            {{detailInfo.name}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='基金金额'>
+          <el-tag class='info-tag' type="info">
+            {{detailInfo.funds}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='基金介绍'>
+          <el-tag class='info-tag-uNumber' type="info">
+            {{detailInfo.fundsDesc}}
+          </el-tag>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
+    <ul v-if='showFund' class='ul-Fund'>
+      <li class='li-Fund'>
+        <p v-for='item in tableTitle' :key='item.id' class="p-Fund">
+          {{item.name}}
+        </p>
+      </li>
+      <li v-for='item in tableInfo' :key='item.id' class='li-Fund'>
+        <p class="p-Fund">
+          {{item.name}}
+        </p>
+        <p class="p-Fund">
+          {{item.funds}}
+        </p>
+        <div class="p-Fund">
+          <el-button type='primary' @click='handleDetail(item.id)'>
+            查看
+          </el-button>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -86,8 +133,11 @@ export default {
   data () {
     return {
       activeIndex: '1',
+      order: true,
       personCenter: false,
+      showFund: false,
       dialogTableVisible: false,
+      dialogFundsVisible: false,
       form: {
         name: '',
         tel: '',
@@ -101,7 +151,44 @@ export default {
         date: '',
         name: '',
         address: ''
-      }
+      },
+      tableTitle: [{
+        id: 1,
+        name: '基金名称'
+      }, {
+        id: 2,
+        name: '基金金额'
+      }, {
+        id: 3,
+        name: '操作'
+      }],
+      tableInfo: [{
+        id: '1',
+        name: '阿里基金',
+        funds: '133',
+        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
+      }, {
+        id: '2',
+        name: '腾讯基金',
+        funds: '45',
+        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
+      }, {
+        id: '3',
+        name: '京东基金',
+        funds: '65',
+        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
+      }, {
+        id: '4',
+        name: '美团基金',
+        funds: '12',
+        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
+      }, {
+        id: '5',
+        name: '天虎基金',
+        funds: '43',
+        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
+      }],
+      detailInfo: {}
     }
   },
   created () {
@@ -120,18 +207,28 @@ export default {
     handleSelect (key, keyPath) {
       switch (key) {
         case '1':
+          this.order = true
+          this.showFund = false
           this.personCenter = false
           break
         case '2':
+          this.order = true
+          this.showFund = false
           this.personCenter = false
           break
         case '3':
+          this.order = true
+          this.showFund = false
           this.personCenter = false
           break
         case '4':
+          this.order = false
+          this.showFund = true
           this.personCenter = false
           break
         case '5':
+          this.order = false
+          this.showFund = false
           this.personCenter = true
           break
         default:
@@ -165,6 +262,16 @@ export default {
           this.form.tel = res.data.telephone
           this.form.uNumber = res.data.uNumber
         })
+    },
+    handleDetail (id) {
+      console.log(this.tableInfo)
+      this.tableInfo.forEach(el => {
+        if (el.id === id) {
+          this.detailInfo = el
+        }
+      })
+      console.log(this.detailInfo)
+      this.dialogFundsVisible = true
     }
   }
 }
@@ -183,13 +290,34 @@ export default {
   font-size: 1.25rem;
 }
 .info-tag-uNumber{
-  width: 20rem;
-  height: 3rem;
+  min-width: 20rem;
+  min-height: 3rem;
   line-height: 3rem;
   text-align: center;
   font-size: 1.25rem;
   font-weight: bold;
   color: #409EFF;
+}
+.ul-Fund{
+  margin: 3rem auto;
+  width: 66%;
+  border: 1px dashed #b3b3b3
+}
+.li-Fund{
+  margin: .5rem 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  height: 4rem;
+}
+.p-Fund{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20rem;
+  height: 100%;
+  background-color: #ffffff;
+  font-size: 1.3rem;
 }
 .order-btn{
   position: absolute;

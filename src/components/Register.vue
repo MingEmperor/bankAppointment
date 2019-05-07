@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     postUserInfo () {
-      this.$axios.post('/api/register.do', {
+      this.$axios.get('/api/register.do', {
         username: this.userName,
         password: this.password,
         email: this.email,
@@ -57,6 +57,9 @@ export default {
         .then(res => {
           if (res.data.success) {
             console.log(res.data.message)
+            this.$router.push({
+              name: 'Login'
+            })
           } else {
             console.log('注册失败')
             this.$message.error('注册失败，请重试')
@@ -80,10 +83,10 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -10rem;
-  margin-left: -9rem;
+  margin-top: -14rem;
+  margin-left: -15rem;
   padding: .5rem;
-  width: 18rem;
+  width: 30rem;
   height: 28rem;
 }
 header{

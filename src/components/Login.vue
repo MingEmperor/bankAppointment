@@ -39,13 +39,19 @@ export default {
         this.$axios.post('/BankNumber/login.do', {
           username: this.userName,
           password: this.password,
-          unlink: this.unlink === '用户' ? 0 : 1
+          ukinds: this.unlink === '用户' ? 0 : 1
         })
           .then(res => {
             if (res.data.success) {
-              this.$router.push({
-                name: 'Main'
-              })
+              if (this.unlink === '用户') {
+                this.$router.push({
+                  name: 'Main'
+                })
+              } else {
+                this.$router.push({
+                  name: 'Manage'
+                })
+              }
             } else {
               console.log('登陆失败')
               this.$message.error('登陆失败，请重试')
@@ -75,11 +81,11 @@ export default {
   position: absolute;
   top: 50%;
   left: 50%;
-  margin-top: -10rem;
-  margin-left: -9rem;
+  margin-top: -12rem;
+  margin-left: -15rem;
   padding: .5rem;
   width: 30rem;
-  height: 25rem;
+  height: 24rem;
 }
 header{
   text-align: center;
