@@ -9,6 +9,15 @@
         <el-radio-button label="工作人员"></el-radio-button>
       </el-radio-group>
     </div>
+    <el-input
+      v-if='ukinds === "工作人员"'
+      placeholder='请输入工号'
+      v-model='udesc'
+    >
+      <template slot="prepend">
+        工&nbsp;&nbsp;&nbsp;号
+      </template>
+    </el-input>
     <el-input placeholder="请输入用户名" v-model="userName">
       <template slot="prepend">
         用户名
@@ -21,7 +30,7 @@
     </el-input>
     <el-input placeholder="请输入邮箱" v-model="email">
       <template slot="prepend">
-        &nbsp;&nbsp;&nbsp;@&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;@&nbsp;&nbsp;&nbsp;&nbsp;
       </template>
     </el-input>
     <el-input placeholder="请输入手机号" v-model="telephone">
@@ -42,16 +51,18 @@ export default {
       password: '',
       email: '',
       telephone: '',
+      udesc: '',
       ukinds: '用户'
     }
   },
   methods: {
     postUserInfo () {
-      this.$axios.get('/api/register.do', {
+      this.$axios.post('/BankNumber/register.do', {
         username: this.userName,
         password: this.password,
         email: this.email,
         telephone: this.telephone,
+        udesc: this.udesc,
         ukinds: this.ukinds === '用户' ? 0 : 1
       })
         .then(res => {
@@ -59,6 +70,10 @@ export default {
             console.log(res.data.message)
             this.$router.push({
               name: 'Login'
+            })
+            this.$message({
+              message: '注册成功',
+              type: 'success'
             })
           } else {
             console.log('注册失败')
@@ -87,7 +102,7 @@ export default {
   margin-left: -15rem;
   padding: .5rem;
   width: 30rem;
-  height: 28rem;
+  height: 33rem;
 }
 header{
   text-align: center;

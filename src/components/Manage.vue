@@ -1,36 +1,58 @@
 <template>
-  <ul v-if='showFund' class='ul-Fund'>
-    <li class='li-Fund'>
-      <p v-for='item in tableTitle' :key='item.id' class="p-Fund">
-        {{item.name}}
-      </p>
-    </li>
-    <li v-for='item in tableInfo' :key='item.uid' class='li-Fund'>
-      <p class="p-Fund">
-        {{item.username}}
-      </p>
-      <p class="p-Fund">
-        {{item.uNumber}}
-      </p>
-      <div class="p-Fund">
-        <el-button type='primary' @click='handleAccept(item.uid)'>
-          受理
-        </el-button>
-        <el-button type='primary' @click='handleNoAccept(item.uid)'>
-          不受理
-        </el-button>
-        <el-button type='primary' @click='handleAccepting(item.uid)'>
-          受理中
-        </el-button>
-      </div>
-    </li>
-  </ul>
+  <div>
+    <el-menu
+      :default-active="activeIndex"
+      class="el-menu-demo"
+      mode="horizontal"
+      @select="handleSelect"
+      background-color="#409EFF"
+      text-color="#fff"
+      active-text-color="#fff"
+    >
+      <el-menu-item index="1">
+        现金业务
+      </el-menu-item>
+      <el-menu-item index="2">
+        对公转账
+      </el-menu-item>
+      <el-menu-item index="3">
+        外币兑换
+      </el-menu-item>
+      <el-menu-item index="4">
+        理财业务
+      </el-menu-item>
+    </el-menu>
+    <ul class='ul-Fund'>
+      <li class='li-Fund'>
+        <p v-for='item in tableTitle' :key='item.id' class="p-Fund">
+          {{item.name}}
+        </p>
+      </li>
+      <li v-for='item in tableInfo' :key='item.uid' class='li-Fund'>
+        <p class="p-Fund">
+          {{item.username}}
+        </p>
+        <p class="p-Fund">
+          {{item.uNumber}}
+        </p>
+        <div class="p-Fund">
+          <el-button type='primary' @click='handleAccept(item)'>
+            受理
+          </el-button>
+          <el-button type='primary' @click='handleNoAccept(item)'>
+            不受理
+          </el-button>
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
 export default {
   data () {
     return {
+      activeIndex: '1',
       showFund: true,
       tableTitle: [{
         id: 1,
@@ -54,33 +76,76 @@ export default {
     console.log(this.tableInfo)
   },
   methods: {
-    handleAccept (id) {
-      this.$message({
-        message: '已经接受受理',
-        type: 'success'
-      })
-      // this.$axios.get('/BankNumber/Accept.do?uid=' + id)
-      //   .then(res => {
-      //     console.log(res)
-      //     this.$message({
-      //       message: '恭喜你，这是一条成功消息',
-      //       type: 'success'
-      //     })
-      //   })
+    handleSelect (key, keyPath) {
+      this.currentWindow = key
+      switch (key) {
+        case '0':
+          this.order = false
+          this.showFund = false
+          this.showNewNumber = true
+          this.personCenter = false
+          break
+        case '1':
+          this.order = true
+          this.showFund = false
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '2':
+          this.order = true
+          this.showFund = false
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '3':
+          this.order = true
+          this.showFund = false
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '4':
+          this.order = true
+          this.showFund = false
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '5':
+          this.order = false
+          this.showFund = true
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '6':
+          this.order = false
+          this.showFund = false
+          this.showNewNumber = false
+          this.personCenter = true
+          break
+        default:
+          console.log('')
+      }
     },
-    handleNoAccept (id) {
-      this.$message({
-        message: '已经摒弃该受理',
-        type: 'success'
-      })
-      // this.$axios.get('/BankNumber/Noaccept.do?uid=' + id)
-      //   .then(res => {
-      //     console.log(res)
-      //     this.$message({
-      //       message: '恭喜你，这是一条成功消息',
-      //       type: 'success'
-      //     })
-      //   })
+    handleAccept (item) {
+      this.$axios.get('/BankNumber/accept.do?uid=' + item.uid)
+        .then(res => {
+          console.log(res)
+          this.$message({
+            message: '已经接受受理',
+            type: 'success'
+          })
+          this.tableInfo.splice(this.tableInfo.indexOf(item), 1)
+        })
+    },
+    handleNoAccept (item) {
+      this.$axios.get('/BankNumber/noAccept.do?uid=' + item.uid)
+        .then(res => {
+          console.log(res)
+          this.$message({
+            message: '已经摒弃该受理',
+            type: 'success'
+          })
+          this.tableInfo.splice(this.tableInfo.indexOf(item), 1)
+        })
     },
     handleAccepting (id) {
       this.$message({

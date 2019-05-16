@@ -9,24 +9,25 @@
       text-color="#fff"
       active-text-color="#fff"
     >
-      <el-submenu index="1">
-          <template slot="title">现金业务</template>
-          <el-menu-item index="2-4-1">开户</el-menu-item>
-          <el-menu-item index="2-4-2">现金存取</el-menu-item>
-          <el-menu-item index="2-4-3">旧币换新</el-menu-item>
-        </el-submenu>
-      <el-submenu index="2">
-        <template slot="title">对公转账</template>
-        <el-menu-item index="2-1">正常转账</el-menu-item>
-        <el-menu-item index="2-2">加急转账</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="0">
+        排号实况
+      </el-menu-item>
+      <el-menu-item index="1">
+        现金业务
+      </el-menu-item>
+      <el-menu-item index="2">
+        对公转账
+      </el-menu-item>
       <el-menu-item index="3">
         外币兑换
       </el-menu-item>
       <el-menu-item index="4">
         理财业务
       </el-menu-item>
-      <el-menu-item class='user-name' index="5">
+      <el-menu-item index="5">
+        理财信息
+      </el-menu-item>
+      <el-menu-item class='user-name' index="6">
         {{ form.name }}
       </el-menu-item>
     </el-menu>
@@ -38,6 +39,8 @@
     >
       点击排号
     </el-button>
+
+    <!-- 个人信息栏页面 -->
     <el-form
       v-if='personCenter'
       ref="form"
@@ -61,31 +64,39 @@
         <el-input type="textarea" v-model="form.desc"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleUpdate">确认修改</el-button>
+        <el-button type="primary" @click="handleUpdate">
+          确认修改
+        </el-button>
       </el-form-item>
     </el-form>
 
-    <el-dialog title="当前排号信息" :visible.sync="dialogTableVisible">
+    <!-- 获取排号信息的弹框 -->
+    <el-dialog title="排号已经获取：" :visible.sync="dialogTableVisible">
       <el-form ref="form" :model="form" label-width="80px">
-      <el-form-item label='用户名'>
-        <el-tag class='info-tag' type="info">
-          {{form.name}}
-        </el-tag>
-      </el-form-item>
-      <el-form-item label='手机号'>
-        <el-tag class='info-tag' type="info">
-          {{form.tel}}
-        </el-tag>
-      </el-form-item>
-      <el-form-item label='排号号码'>
-        <el-tag class='info-tag-uNumber' type="info">
-          {{form.uNumber}}
-        </el-tag>
-      </el-form-item>
-    </el-form>
+        <el-form-item label='用户名'>
+          <el-tag class='info-tag' type="info">
+            {{form.name}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='手机号'>
+          <el-tag class='info-tag' type="info">
+            {{form.tel}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='排号号码'>
+          <el-tag class='info-tag-uNumber' type="info">
+            {{form.uNumber}}
+          </el-tag>
+        </el-form-item>
+      </el-form>
     </el-dialog>
 
-    <el-dialog title="基金介绍" :visible.sync="dialogFundsVisible">
+    <!-- 基金介绍弹框 -->
+    <el-dialog
+      title='基金介绍'
+      class='fund-dialog'
+      :visible.sync='dialogFundsVisible'
+    >
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item label='基金名称'>
           <el-tag class='info-tag' type="info">
@@ -98,13 +109,19 @@
           </el-tag>
         </el-form-item>
         <el-form-item label='基金介绍'>
-          <el-tag class='info-tag-uNumber' type="info">
-            {{detailInfo.fundsDesc}}
-          </el-tag>
+          <el-input
+            class='info-tag'
+            type="textarea"
+            :rows="4"
+            placeholder="请输入内容"
+            v-model="detailInfo.fundsDesc"
+            disabled
+          />
         </el-form-item>
       </el-form>
     </el-dialog>
 
+    <!-- 基金介绍 -->
     <ul v-if='showFund' class='ul-Fund'>
       <li class='li-Fund'>
         <p v-for='item in tableTitle' :key='item.id' class="p-Fund">
@@ -125,6 +142,27 @@
         </div>
       </li>
     </ul>
+
+    <!-- 当前排号信息 -->
+    <div v-if='showNewNumber' class='newNumber-warpper'>
+      <el-form ref="form" :model="form" label-width="120px">
+        <el-form-item label='当前号码:'>
+          <el-tag class='info-tag' type="info">
+            {{nextInfo.uNumber}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='请前往当前窗口:'>
+          <el-tag class='info-tag-uNumber' type="info">
+            {{nextInfo.chuangkou}}
+          </el-tag>
+        </el-form-item>
+        <el-form-item label='下一位号码为:'>
+          <el-tag class='info-tag' type="info">
+            {{nextInfo.nextNumber}}
+          </el-tag>
+        </el-form-item>
+      </el-form>
+    </div>
   </div>
 </template>
 
@@ -132,10 +170,12 @@
 export default {
   data () {
     return {
-      activeIndex: '1',
+      currentWindow: '',
+      activeIndex: '0',
       order: true,
       personCenter: false,
       showFund: false,
+      showNewNumber: false,
       dialogTableVisible: false,
       dialogFundsVisible: false,
       form: {
@@ -188,13 +228,13 @@ export default {
         funds: '43',
         fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
       }],
-      detailInfo: {}
+      detailInfo: {},
+      nextInfo: {}
     }
   },
   created () {
     this.$axios.post('/BankNumber/user.do')
       .then(res => {
-        console.log(res.data)
         this.form.name = res.data.username
         this.form.tel = res.data.telephone
         this.form.qq = res.data.qq
@@ -202,33 +242,58 @@ export default {
         this.form.password = res.data.password
         this.form.desc = res.data.udesc
       })
+    this.handleSelect('0')
+    this.$axios.post('/BankNumber/next.do')
+      .then(res => {
+        console.log(res.data[0])
+        this.nextInfo = res.data[0]
+        this.nextInfo.nextNumber = res.data[1].uNumber
+      })
   },
   methods: {
     handleSelect (key, keyPath) {
+      this.currentWindow = key
       switch (key) {
+        case '0':
+          this.order = false
+          this.showFund = false
+          this.showNewNumber = true
+          this.personCenter = false
+          break
         case '1':
           this.order = true
           this.showFund = false
+          this.showNewNumber = false
           this.personCenter = false
           break
         case '2':
           this.order = true
           this.showFund = false
+          this.showNewNumber = false
           this.personCenter = false
           break
         case '3':
           this.order = true
           this.showFund = false
+          this.showNewNumber = false
           this.personCenter = false
           break
         case '4':
-          this.order = false
-          this.showFund = true
+          this.order = true
+          this.showFund = false
+          this.showNewNumber = false
           this.personCenter = false
           break
         case '5':
           this.order = false
+          this.showFund = true
+          this.showNewNumber = false
+          this.personCenter = false
+          break
+        case '6':
+          this.order = false
           this.showFund = false
+          this.showNewNumber = false
           this.personCenter = true
           break
         default:
@@ -284,8 +349,6 @@ export default {
 }
 .info-tag{
   width: 20rem;
-  height: 3rem;
-  line-height: 3rem;
   text-align: center;
   font-size: 1.25rem;
 }
@@ -301,7 +364,7 @@ export default {
 .ul-Fund{
   margin: 3rem auto;
   width: 66%;
-  border: 1px dashed #b3b3b3
+  border: 1px dashed #b3b3b3;
 }
 .li-Fund{
   margin: .5rem 0;
@@ -332,5 +395,22 @@ export default {
   left: 50%;
   margin-left: -15rem;
   width: 30rem;
+}
+.newNumber-warpper{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+</style>
+<style>
+.el-dialog{
+  width: 560px;
+}
+.el-form{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 </style>
