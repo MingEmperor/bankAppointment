@@ -9,8 +9,8 @@
       text-color="#fff"
       active-text-color="#fff"
     >
-      <el-menu-item index="0">
-        排号实况
+      <el-menu-item index="7">
+        首页
       </el-menu-item>
       <el-menu-item index="1">
         现金业务
@@ -98,6 +98,11 @@
       :visible.sync='dialogFundsVisible'
     >
       <el-form ref="form" :model="form" label-width="80px">
+        <el-form-item>
+          <img
+          src="../assets/img/dialog_1.jpg"
+          style='width:300px;' />
+        </el-form-item>
         <el-form-item label='基金名称'>
           <el-tag class='info-tag' type="info">
             {{detailInfo.name}}
@@ -143,8 +148,21 @@
       </li>
     </ul>
 
-    <!-- 当前排号信息 -->
-    <div v-if='showNewNumber' class='newNumber-warpper'>
+    <!-- 当前排号信息 + 轮播图-->
+    <el-carousel
+      v-if='showNowNumber'
+      class='carousel-warpper'
+      :interval='4000'
+      type='card'
+      height="200px"
+    >
+      <el-carousel-item v-for="item in carouselImg" :key="item.id">
+        <h3 class="medium">
+          <img :src='item.imgUrl' />
+        </h3>
+      </el-carousel-item>
+    </el-carousel>
+    <div v-if='showNowNumber' class='newNumber-warpper'>
       <el-form ref="form" :model="form" label-width="120px">
         <el-form-item label='当前号码:'>
           <el-tag class='info-tag' type="info">
@@ -171,11 +189,11 @@ export default {
   data () {
     return {
       currentWindow: '',
-      activeIndex: '0',
-      order: true,
+      activeIndex: '7',
+      order: false,
       personCenter: false,
       showFund: false,
-      showNewNumber: false,
+      showNowNumber: false,
       dialogTableVisible: false,
       dialogFundsVisible: false,
       form: {
@@ -192,6 +210,19 @@ export default {
         name: '',
         address: ''
       },
+      carouselImg: [{
+        id: 1,
+        imgUrl: require('../assets/img/banner_1.jpg')
+      }, {
+        id: 2,
+        imgUrl: require('../assets/img/banner_2.jpg')
+      }, {
+        id: 3,
+        imgUrl: require('../assets/img/banner_3.jpg')
+      }, {
+        id: 4,
+        imgUrl: require('../assets/img/banner_4.jpg')
+      }],
       tableTitle: [{
         id: 1,
         name: '基金名称'
@@ -242,59 +273,59 @@ export default {
         this.form.password = res.data.password
         this.form.desc = res.data.udesc
       })
-    this.handleSelect('0')
     this.$axios.post('/BankNumber/next.do')
       .then(res => {
-        console.log(res.data[0])
+        console.log(res.data)
         this.nextInfo = res.data[0]
-        this.nextInfo.nextNumber = res.data[1].uNumber
+        this.nextInfo.nextNumber = res.data[1].uNumber ? res.data[1].uNumber : ''
       })
+    this.handleSelect('7')
   },
   methods: {
     handleSelect (key, keyPath) {
       this.currentWindow = key
       switch (key) {
-        case '0':
-          this.order = false
-          this.showFund = false
-          this.showNewNumber = true
-          this.personCenter = false
-          break
         case '1':
           this.order = true
           this.showFund = false
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = false
           break
         case '2':
           this.order = true
           this.showFund = false
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = false
           break
         case '3':
           this.order = true
           this.showFund = false
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = false
           break
         case '4':
           this.order = true
           this.showFund = false
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = false
           break
         case '5':
           this.order = false
           this.showFund = true
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = false
           break
         case '6':
           this.order = false
           this.showFund = false
-          this.showNewNumber = false
+          this.showNowNumber = false
           this.personCenter = true
+          break
+        case '7':
+          this.order = false
+          this.showFund = false
+          this.showNowNumber = true
+          this.personCenter = false
           break
         default:
           console.log('')
@@ -398,7 +429,7 @@ export default {
 }
 .newNumber-warpper{
   position: absolute;
-  top: 50%;
+  top: 72%;
   left: 50%;
   transform: translate(-50%,-50%);
 }
@@ -412,5 +443,22 @@ export default {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+.carousel-warpper{
+  margin: 6rem auto;
+  width: 80%;
+}
+.el-carousel__item h3 {
+    color: #475669;
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 200px;
+    margin: 0;
+  }
+.el-carousel__item:nth-child(2n) {
+  background-color: #99a9bf;
+}
+.el-carousel__item:nth-child(2n+1) {
+  background-color: #d3dce6;
 }
 </style>
