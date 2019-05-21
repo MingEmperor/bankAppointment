@@ -100,8 +100,12 @@
       <el-form ref="form" :model="form" label-width="80px">
         <el-form-item>
           <img
-          src="../assets/img/dialog_1.jpg"
-          style='width:300px;' />
+           :src="detailInfo.imgUrl"
+            style='width: 400px;
+                   height: 200px;
+                   transform: translateX(-10%);
+                   border-radius: 6px;'
+          />
         </el-form-item>
         <el-form-item label='基金名称'>
           <el-tag class='info-tag' type="info">
@@ -113,15 +117,12 @@
             {{detailInfo.funds}}
           </el-tag>
         </el-form-item>
-        <el-form-item label='基金介绍'>
-          <el-input
-            class='info-tag'
-            type="textarea"
-            :rows="4"
-            placeholder="请输入内容"
-            v-model="detailInfo.fundsDesc"
-            disabled
-          />
+        <el-form-item>
+          <div
+            class='info-desc'
+          >
+            {{detailInfo.fundsDesc}}
+          </div>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -212,16 +213,13 @@ export default {
       },
       carouselImg: [{
         id: 1,
-        imgUrl: require('../assets/img/banner_1.jpg')
+        imgUrl: '../../static/mock/img/banner_1.jpg'
       }, {
         id: 2,
-        imgUrl: require('../assets/img/banner_2.jpg')
+        imgUrl: '../../static/mock/img/banner_2.png'
       }, {
         id: 3,
-        imgUrl: require('../assets/img/banner_3.jpg')
-      }, {
-        id: 4,
-        imgUrl: require('../assets/img/banner_4.jpg')
+        imgUrl: '../../static/mock/img/banner_3.png'
       }],
       tableTitle: [{
         id: 1,
@@ -232,32 +230,6 @@ export default {
       }, {
         id: 3,
         name: '操作'
-      }],
-      tableInfo: [{
-        id: '1',
-        name: '阿里基金',
-        funds: '133',
-        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
-      }, {
-        id: '2',
-        name: '腾讯基金',
-        funds: '45',
-        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
-      }, {
-        id: '3',
-        name: '京东基金',
-        funds: '65',
-        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
-      }, {
-        id: '4',
-        name: '美团基金',
-        funds: '12',
-        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
-      }, {
-        id: '5',
-        name: '天虎基金',
-        funds: '43',
-        fundsDesc: '阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金阿里基金'
       }],
       detailInfo: {},
       nextInfo: {}
@@ -275,9 +247,12 @@ export default {
       })
     this.$axios.post('/BankNumber/next.do')
       .then(res => {
-        console.log(res.data)
         this.nextInfo = res.data[0]
         this.nextInfo.nextNumber = res.data[1].uNumber ? res.data[1].uNumber : ''
+      })
+    this.$axios.get('../../static/mock/fund.json')
+      .then(res => {
+        this.tableInfo = res.data
       })
     this.handleSelect('7')
   },
@@ -341,7 +316,6 @@ export default {
       })
         .then(res => {
           if (res.data.message) {
-            console.log(res.data.message)
             this.$message({
               message: '修改成功，重新登录后可见',
               type: 'success'
@@ -353,20 +327,17 @@ export default {
       this.dialogTableVisible = true
       this.$axios.post('/BankNumber/paihao.do')
         .then(res => {
-          console.log(res.data)
           this.form.name = res.data.username
           this.form.tel = res.data.telephone
           this.form.uNumber = res.data.uNumber
         })
     },
     handleDetail (id) {
-      console.log(this.tableInfo)
       this.tableInfo.forEach(el => {
         if (el.id === id) {
           this.detailInfo = el
         }
       })
-      console.log(this.detailInfo)
       this.dialogFundsVisible = true
     }
   }
@@ -379,9 +350,21 @@ export default {
   float: right;
 }
 .info-tag{
-  width: 20rem;
+  width: 24rem;
+  color: #333;
+  background-color: #fff;
   text-align: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
+  font-family: '楷体';
+  font-weight: bold;
+}
+.info-desc{
+  width: 46rem;
+  color: #666;
+  background-color: #fff;
+  text-align: center;
+  font-size: 1.1rem;
+  transform: translateX(-8%);
 }
 .info-tag-uNumber{
   min-width: 20rem;
@@ -391,6 +374,7 @@ export default {
   font-size: 1.25rem;
   font-weight: bold;
   color: #409EFF;
+  background-color: #fff;
 }
 .ul-Fund{
   margin: 3rem auto;
@@ -436,7 +420,7 @@ export default {
 </style>
 <style>
 .el-dialog{
-  width: 560px;
+  width: 660px;
 }
 .el-form{
   display: flex;
@@ -449,12 +433,12 @@ export default {
   width: 80%;
 }
 .el-carousel__item h3 {
-    color: #475669;
-    font-size: 14px;
-    opacity: 0.75;
-    line-height: 200px;
-    margin: 0;
-  }
+  color: #475669;
+  font-size: 14px;
+  opacity: 0.75;
+  line-height: 200px;
+  margin: 0;
+}
 .el-carousel__item:nth-child(2n) {
   background-color: #99a9bf;
 }
