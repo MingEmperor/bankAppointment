@@ -13,16 +13,10 @@
         首页
       </el-menu-item>
       <el-menu-item index="1">
-        现金业务
+        业务选择
       </el-menu-item>
       <el-menu-item index="2">
-        对公转账
-      </el-menu-item>
-      <el-menu-item index="3">
-        外币兑换
-      </el-menu-item>
-      <el-menu-item index="4">
-        理财业务
+        金融资讯
       </el-menu-item>
       <el-menu-item index="5">
         理财信息
@@ -31,14 +25,19 @@
         {{ form.name }}
       </el-menu-item>
     </el-menu>
-    <el-button
+    <div
       v-if='order'
       class='order-btn'
-      type='primary'
-      @click='handleOpenDialog'
     >
-      点击排号
-    </el-button>
+      <el-button
+        v-for='item of btnTitle'
+        :key='item.id'
+        type='primary'
+        @click='handleOpenDialog'
+      >
+        {{item.name}}
+      </el-button>
+    </div>
 
     <!-- 个人信息栏页面 -->
     <el-form
@@ -163,6 +162,7 @@
         </h3>
       </el-carousel-item>
     </el-carousel>
+
     <div v-if='showNowNumber' class='newNumber-warpper'>
       <el-form ref="form" :model="form" label-width="120px">
         <el-form-item label='当前号码:'>
@@ -182,6 +182,22 @@
         </el-form-item>
       </el-form>
     </div>
+
+    <div v-if='showNews' class='showNews-warpper'>
+      <el-collapse v-model="activeNames" @change="handleChange">
+        <el-collapse-item
+          v-for='item of newsList'
+          :key='item.name'
+          :title='item.title'
+          :name='item.name'
+        >
+          <p>
+            {{item.content}}
+          </p>
+          <img :src='item.imgUrl' />
+        </el-collapse-item>
+      </el-collapse>
+    </div>
   </div>
 </template>
 
@@ -189,11 +205,13 @@
 export default {
   data () {
     return {
+      activeNames: ['1'],
       currentWindow: '',
       activeIndex: '7',
       order: false,
       personCenter: false,
       showFund: false,
+      showNews: false,
       showNowNumber: false,
       dialogTableVisible: false,
       dialogFundsVisible: false,
@@ -216,10 +234,13 @@ export default {
         imgUrl: '../../static/mock/img/banner_1.jpg'
       }, {
         id: 2,
-        imgUrl: '../../static/mock/img/banner_2.png'
+        imgUrl: '../../static/mock/img/banner_2.jpg'
       }, {
         id: 3,
-        imgUrl: '../../static/mock/img/banner_3.png'
+        imgUrl: '../../static/mock/img/banner_3.jpg'
+      }, {
+        id: 4,
+        imgUrl: '../../static/mock/img/banner_4.jpg'
       }],
       tableTitle: [{
         id: 1,
@@ -230,6 +251,40 @@ export default {
       }, {
         id: 3,
         name: '操作'
+      }],
+      btnTitle: [{
+        id: 1,
+        name: '现金业务'
+      }, {
+        id: 2,
+        name: '对公转账'
+      }, {
+        id: 3,
+        name: '外币兑换'
+      }, {
+        id: 4,
+        name: '理财业务'
+      }],
+      newsList: [{
+        name: 1,
+        title: '比特币价格持续高涨',
+        content: '近一个月以来，比特币的涨势让人触不及防。市面上已经出现一连串解释这波行情的说法，炒币情绪普遍乐观。随着市场情绪转变和比特币采用率的增加，对于许多人来说，2019年可能是用低成本获取一枚完整比特币的最后一年。历经十年，比特币已经被证明网络的耐用性和可靠性，未来的每一天，比特币也会将这些特点延续下去。对市场上的投资者而言，如果比特币不被“高估”，购买比特币这件事儿就没有一点吸引力，但当比特币大幅下跌时，大家更没有兴趣买它。这一点在2017年得到了证明，当价格疯涨，市场反应接近疯狂。',
+        imgUrl: '../../static/mock/img/news_1.jpg'
+      }, {
+        name: 2,
+        title: '“二三四五”重生还是“临死”挣扎?',
+        content: '近日，二三四五发布2018年年报，和讯网发现，自跨界经营互联网金融业务以来，其业绩有了很大好转，从扣除非经常性损益的净利润便可一览无余。数据显示，其2018年扣非净利润为13.34亿元，同比增长率为46.25%，销售净利率为36.36%，在同行业居前列。一方面，从导航业务跨界互联网金融，对二三四五来说，算得上一次“重生”；另一方面，从现金贷被叫停到会员费式砍头息，二三四五似乎再一次游走边缘。重生后，是再次辉煌？还是危险临近呢？',
+        imgUrl: '../../static/mock/img/news_2.jpg'
+      }, {
+        name: 3,
+        title: '华为“渡劫”后或将更加强大',
+        content: '5月22日，任正非签发一封电邮《不懂战略退却的人，就不会战略进攻》，进行了一系列的战略调整，并表示个别地方的调整不影响大格局，要保护好调整部分的员工。任正非提到：”未来五年我们将投资1000亿美元的研发经费，通过网络架构重构来解决可信的问题。要向为我们服务的零部件、向我们需要的大部件去做一些扩张，掌握设计和生产工艺。车联网、人工智能、边缘计算是我们未来的三大突破点。华为的产业组合要均衡。”美国政府在华为全球部署5G网络取得先发优势之际，开始牵头遏制的行为，对华为而言，从短期来看，它的供应链将承受不少压力。但长远来看，也许渡劫之后，华为将更加强大。',
+        imgUrl: '../../static/mock/img/news_3.jpg'
+      }, {
+        name: 4,
+        title: '科创板大规模分拆上市',
+        content: '《证券日报》记者独家统计发现，在沪深交易所的投资者与上市公司互动平台问答中，“科创板”作为关键词出现了接近8000次，其中“科创板+上市”（主要指上市公司分拆旗下资产在科创板上市）作为关键词共出现近4000次。即便考虑到在同一个问题中科创板可能出现不止一次，以及部分上市公司回答的对于提问统计数据的影响，投资者至少已经就分拆上市“千问”上市公司。《证券日报》记者在沪深交易所互动平台检索发现，有大量投资者询问上市公司子公司分拆至科创板上市的事宜。据记者观察，上市公司的生物医药类、科技类、半导体类、新能源类以及金融科技类子公司或资产被投资者寄予厚望。',
+        imgUrl: '../../static/mock/img/news_4.jpg'
       }],
       detailInfo: {},
       nextInfo: {}
@@ -262,42 +317,35 @@ export default {
       switch (key) {
         case '1':
           this.order = true
+          this.showNews = false
           this.showFund = false
           this.showNowNumber = false
           this.personCenter = false
           break
         case '2':
-          this.order = true
-          this.showFund = false
-          this.showNowNumber = false
-          this.personCenter = false
-          break
-        case '3':
-          this.order = true
-          this.showFund = false
-          this.showNowNumber = false
-          this.personCenter = false
-          break
-        case '4':
-          this.order = true
+          this.order = false
+          this.showNews = true
           this.showFund = false
           this.showNowNumber = false
           this.personCenter = false
           break
         case '5':
           this.order = false
+          this.showNews = false
           this.showFund = true
           this.showNowNumber = false
           this.personCenter = false
           break
         case '6':
           this.order = false
+          this.showNews = false
           this.showFund = false
           this.showNowNumber = false
           this.personCenter = true
           break
         case '7':
           this.order = false
+          this.showNews = false
           this.showFund = false
           this.showNowNumber = true
           this.personCenter = false
@@ -379,7 +427,7 @@ export default {
 .ul-Fund{
   margin: 3rem auto;
   width: 66%;
-  border: 1px dashed #b3b3b3;
+  border: 1px solid #eeeeee;
 }
 .li-Fund{
   margin: .5rem 0;
@@ -399,10 +447,15 @@ export default {
 }
 .order-btn{
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
   top: 50%;
   left: 50%;
   margin-left: -6rem;
+  margin-top: -8rem;
   width: 12rem;
+  height: 16rem;
 }
 .person-info{
   position: absolute;
@@ -416,6 +469,10 @@ export default {
   top: 72%;
   left: 50%;
   transform: translate(-50%,-50%);
+}
+.showNews-warpper{
+  margin: 3rem auto;
+  width: 80%;
 }
 </style>
 <style>
